@@ -11,8 +11,8 @@ Group:          System Environment/Daemons
 URL:            http://haproxy.1wt.eu/
 Source0:        http://haproxy.1wt.eu/download/%{base_version}/src/devel/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
-BuildRequires:  pcre-devel
-Requires:       %{systemctl}
+BuildRequires:  pcre-devel systemd
+Requires:       systemd
 
 %description
 HA-Proxy is a TCP/HTTP reverse proxy which is particularly suited for high
@@ -48,7 +48,7 @@ risking the system's stability.
 
 %{__install} -s %{name} %{buildroot}%{_sbindir}/
 %{__install} -m 755 doc/%{name}.1 %{buildroot}%{_mandir}/man1/
-%{__install} -m 644 contrib/systemd/%{name}.service.in %{buildroot}%{_untidir}/%{name}.service
+%{__install} -m 644 contrib/systemd/%{name}.service.in %{buildroot}%{_unitdir}/%{name}.service
  
 %clean
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
@@ -68,7 +68,7 @@ risking the system's stability.
 %defattr(-,root,root)
 %doc %{_mandir}/man1/%{name}.1*
 %attr(0755,root,root) %{_sbindir}/%{name}
-%attr(0644,root,root) %{buildroot}%{_untidir}/%{name}.service
+%attr(0644,root,root) %{_unitdir}/%{name}.service
 
 %changelog
 * Thu Nov 17 2016 Gabriel Paiu <gabriel.paiu@gmail.com>
