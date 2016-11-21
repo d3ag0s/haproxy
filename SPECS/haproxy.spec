@@ -1,18 +1,19 @@
 %define base_version 1.6
-%define version %{base_version}.9
-%define systemctl /bin/systemctl
+%define version      %{base_version}.9
+%define systemctl    /bin/systemctl
 
 Summary:        HA-Proxy is a TCP/HTTP reverse proxy for high availability environments
 Name:           haproxy
 Version:        %{version}
-Release:        1
+Release:        2
 License:        GPL
 Group:          System Environment/Daemons
-URL:            http://haproxy.1wt.eu/
-Source0:        http://haproxy.1wt.eu/download/%{base_version}/src/devel/%{name}-%{version}.tar.gz
+URL:            http://haproxy.org/
+Source0:        http://haproxy.org/download/%{base_version}/src/%{name}-%{version}.tar.gz
+Source1:        haproxy.service.in
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
-BuildRequires:  pcre-devel systemd
-Requires:       systemd
+BuildRequires:  pcre-devel autoconf
+Requires:       %{systemctl}
 
 %description
 HA-Proxy is a TCP/HTTP reverse proxy which is particularly suited for high
@@ -41,18 +42,19 @@ risking the system's stability.
 
 %install
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
- 
+
 %{__install} -d %{buildroot}%{_sbindir}
 %{__install} -d %{buildroot}%{_mandir}/man1/
 %{__install} -d %{buildroot}%{_unitdir}
 
 %{__install} -s %{name} %{buildroot}%{_sbindir}/
+%{__install} -s %{name}-systemd-wrapper %{buildroot}%{_sbindir}/
 %{__install} -m 755 doc/%{name}.1 %{buildroot}%{_mandir}/man1/
-%{__install} -m 644 contrib/systemd/%{name}.service.in %{buildroot}%{_unitdir}/%{name}.service
- 
+%{__install} -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
+
 %clean
 [ "%{buildroot}" != "/" ] && %{__rm} -rf %{buildroot}
- 
+
 %post
 %{systemctl} daemon-reload >/dev/null 2>&1
 %{systemctl} enable %{name}
@@ -68,6 +70,7 @@ risking the system's stability.
 %defattr(-,root,root)
 %doc %{_mandir}/man1/%{name}.1*
 %attr(0755,root,root) %{_sbindir}/%{name}
+%attr(0755,root,root) %{_sbindir}/%{name}-systemd-wrapper
 %attr(0644,root,root) %{_unitdir}/%{name}.service
 
 %changelog
